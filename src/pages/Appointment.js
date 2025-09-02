@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../component/Header';
 import Footer from '../component/Footer';
-// import axios from 'axios';
+import axios from 'axios';
 
 const Appointment = () => {
   const [formData, setFormData] = useState({
@@ -108,30 +108,32 @@ const Appointment = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      // const response = await axios.post("http://localhost:5000/api/appointments", formData);
+      const response = await axios.post("http://localhost:4010/api/appointments", formData);
       
-      setMessage({
-        type: 'success',
-        text: 'Appointment submitted successfully! We will contact you soon.'
-      });
-      
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        mobile: "",
-        gender: "male",
-        timeOfDay: "Morning",
-        wayToReach: "Phone",
-        date: "",
-        month: "",
-        year: "",
-        hrs: "",
-        mins: "",
-        sec: "",
-        address: "",
-        reason: "",
-      });
+      if (response.data.success) {
+        setMessage({
+          type: 'success',
+          text: response.data.message
+        });
+        
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          mobile: "",
+          gender: "male",
+          timeOfDay: "Morning",
+          wayToReach: "Phone",
+          date: "",
+          month: "",
+          year: "",
+          hrs: "",
+          mins: "",
+          sec: "",
+          address: "",
+          reason: "",
+        });
+      }
     } catch (error) {
       console.error("Error submitting appointment:", error);
       
@@ -139,6 +141,11 @@ const Appointment = () => {
         setMessage({
           type: 'error',
           text: error.response.data.message
+        });
+      } else if (error.response?.data?.errors) {
+        setMessage({
+          type: 'error',
+          text: error.response.data.errors.join(', ')
         });
       } else {
         setMessage({

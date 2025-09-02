@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from '../component/Header'
 import Footer from '../component/Footer'
 import Slider from 'react-slick'
@@ -7,8 +7,12 @@ import "slick-carousel/slick/slick-theme.css"
 import { Link } from "react-router-dom";
 import About from '../component/common/About'
 import Testimonial from '../component/common/Testimonial'
+import axios from 'axios'
 
 const Banner = () => {
+  const [bannerImages, setBannerImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const settings = {
     dots: false,
     infinite: true,
@@ -20,13 +24,60 @@ const Banner = () => {
     arrows: true
   }
 
-  const slides = [
-    { title: "HEALTH", desc: "Achieve physical, mental, emotional, and spiritual well-being" },
-    { title: "ABUNDANCE", desc: "Attract success and abundance of time, love and money" },
-    { title: "RELATIONSHIPS", desc: "Attract new and strengthen troubled relationships" },
-    { title: "PEACE", desc: "Experience lasting joy, peace and vitality" },
-    { title: "PERSONAL GROWTH", desc: "Unlock intuition powers, boost confidence and discover your life’s purpose" }
+  const defaultSlides = [
+    { title: "HEALTH", desc: "Achieve physical, mental, emotional, and spiritual well-being", image: "img/circle_img.webp" },
+    { title: "ABUNDANCE", desc: "Attract success and abundance of time, love and money", image: "img/circle_img.webp" },
+    { title: "RELATIONSHIPS", desc: "Attract new and strengthen troubled relationships", image: "img/circle_img.webp" },
+    { title: "PEACE", desc: "Experience lasting joy, peace and vitality", image: "img/circle_img.webp" },
+    { title: "PERSONAL GROWTH", desc: "Unlock intuition powers, boost confidence and discover your life's purpose", image: "img/circle_img.webp" }
   ]
+
+  // Fetch banner images from API
+  useEffect(() => {
+    const fetchBannerImages = async () => {
+      try {
+        const response = await axios.get('http://localhost:4010/api/content/types/dashboard_image?isActive=true&limit=50');
+        if (response.data.success) {
+          const heroImages = response.data.data.filter(img =>
+            img.metadata?.section === 'hero' || img.metadata?.section === 'banner'
+          );
+          setBannerImages(heroImages);
+        }
+      } catch (error) {
+        console.error('Error fetching banner images:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBannerImages();
+  }, []);
+
+  // Combine default slides with dynamic images
+  const slides = defaultSlides.map((slide, index) => {
+    const dynamicImage = bannerImages[index];
+    return {
+      ...slide,
+      image: dynamicImage?.imageUrl || slide.image,
+      alt: dynamicImage?.imageAlt || slide.title
+    };
+  });
+
+  if (loading) {
+    return (
+      <section className="as_banner_wrapper">
+        <div className="container-fluid">
+          <div className="row as_verticle_center">
+            <div className="col-12 text-center">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="as_banner_wrapper">
@@ -38,7 +89,7 @@ const Banner = () => {
                 {/* Left Column */}
                 <div className="col-lg-6 col-md-6 col-sm-12">
                   <div className="as_banner_detail">
-                    <h5 className="as_orange">What’s Your Sign ?</h5>
+                    <h5 className="as_orange">What's Your Sign ?</h5>
                     <h1>{slide.title}</h1>
                     <p>{slide.desc}</p>
                     <Link to="" className="as_btn">read more</Link>
@@ -48,7 +99,14 @@ const Banner = () => {
                 {/* Right Column */}
                 <div className="col-lg-6 col-md-6 col-sm-12">
                   <div className="as_banner_img text-center">
-                    <img src="img/circle_img.webp" alt="Circle Banner" className="img-responsive" />
+                    <img
+                      src={slide.image}
+                      alt={slide.alt}
+                      className="img-responsive"
+                      onError={(e) => {
+                        e.target.src = "img/circle_img.webp"; // Fallback image
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -61,6 +119,64 @@ const Banner = () => {
 }
 
 const Services = () => {
+  const [serviceImages, setServiceImages] = useState([]);
+
+  const defaultServices = [
+    {
+      title: "LIFE COACHING",
+      description: "Life coaching is a professional service designed to help individuals clarify REIKI , CRYSTAL HEALING and More ...",
+      image: "img/LIFECOACHING.png",
+      link: "Services/lifecoaching.php"
+    },
+    {
+      title: "HO'OPONOPONO",
+      description: "The ho'oponopono prayer is a Hawaiian practice of forgiveness and reconciliation...",
+      image: "assets/images/svg/service2.svg",
+      link: "Services/hooponopono.php"
+    },
+    {
+      title: "LAMAFERA AND YOGMAYA",
+      description: "Yogmaya is a combination of all deities and guru's energy ...",
+      image: "assets/images/svg/service3.svg",
+      link: "Services/LAMAFERAANDYOGMAYA.php"
+    },
+    {
+      title: "TWIN FLAME",
+      description: "The concept of a \"twin flame\" is rooted in spiritual and metaphysical beliefs. It is often seen as a deep, soul-level ...",
+      image: "assets/images/svg/service4.svg",
+      link: "Services/TWINFLAME.php"
+    }
+  ];
+
+  // Fetch service images from API
+  useEffect(() => {
+    const fetchServiceImages = async () => {
+      try {
+        const response = await axios.get('http://localhost:4010/api/content/types/dashboard_image?isActive=true&limit=50');
+        if (response.data.success) {
+          const servicesImages = response.data.data.filter(img =>
+            img.metadata?.section === 'services'
+          );
+          setServiceImages(servicesImages);
+        }
+      } catch (error) {
+        console.error('Error fetching service images:', error);
+      }
+    };
+
+    fetchServiceImages();
+  }, []);
+
+  // Combine default services with dynamic images
+  const services = defaultServices.map((service, index) => {
+    const dynamicImage = serviceImages[index];
+    return {
+      ...service,
+      image: dynamicImage?.imageUrl || service.image,
+      alt: dynamicImage?.imageAlt || service.title
+    };
+  });
+
   return (
     <section className="as_service_wrapper as_padderTop80 as_padderBottom80">
       <div className="container">
@@ -75,79 +191,27 @@ const Services = () => {
             </p>
           </div>
 
-          {/* Service 1 */}
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-            <div className="as_service_box text-center">
-              <span className="as_icon">
-                <img src="img/LIFECOACHING.png" alt="Life Coaching" />
-              </span>
-              <h4 className="as_subheading">LIFE COACHING</h4>
-              <p>
-                Life coaching is a professional service designed to help
-                individuals clarify REIKI , CRYSTAL HEALING and More ...
-              </p>
-              <a href="Services/lifecoaching.php" className="as_link">
-                read more
-              </a>
+          {/* Dynamic Services */}
+          {services.map((service, index) => (
+            <div key={index} className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+              <div className="as_service_box text-center">
+                <span className="as_icon">
+                  <img
+                    src={service.image}
+                    alt={service.alt}
+                    onError={(e) => {
+                      e.target.src = defaultServices[index].image; // Fallback to default image
+                    }}
+                  />
+                </span>
+                <h4 className="as_subheading">{service.title}</h4>
+                <p>{service.description}</p>
+                <a href={service.link} className="as_link">
+                  read more
+                </a>
+              </div>
             </div>
-          </div>
-
-          {/* Service 2 */}
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-            <div className="as_service_box text-center">
-              <span className="as_icon">
-                <img
-                  src="assets/images/svg/service2.svg"
-                  alt="Ho'oponopono"
-                />
-              </span>
-              <h4 className="as_subheading">HO'OPONOPONO</h4>
-              <p>
-                The ho’oponopono prayer is a Hawaiian practice of forgiveness
-                and reconciliation...
-              </p>
-              <a href="Services/hooponopono.php" className="as_link">
-                read more
-              </a>
-            </div>
-          </div>
-
-          {/* Service 3 */}
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-            <div className="as_service_box text-center">
-              <span className="as_icon">
-                <img
-                  src="assets/images/svg/service3.svg"
-                  alt="Lamafara and Yogmaya"
-                />
-              </span>
-              <h4 className="as_subheading">LAMAFERA AND YOGMAYA</h4>
-              <p>Yogmaya is a combination of all deities and guru’s energy ...</p>
-              <a
-                href="Services/LAMAFERAANDYOGMAYA.php"
-                className="as_link"
-              >
-                read more
-              </a>
-            </div>
-          </div>
-
-          {/* Service 4 */}
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-            <div className="as_service_box text-center">
-              <span className="as_icon">
-                <img src="assets/images/svg/service4.svg" alt="Twin Flame" />
-              </span>
-              <h4 className="as_subheading">TWIN FLAME</h4>
-              <p>
-                The concept of a “twin flame” is rooted in spiritual and
-                metaphysical beliefs. It is often seen as a deep, soul-level ...
-              </p>
-              <a href="Services/TWINFLAME.php" className="as_link">
-                read more
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

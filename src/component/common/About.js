@@ -1,58 +1,120 @@
-import React from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 
 const About = () => {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    arrows: false,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+  const [aboutImages, setAboutImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Default fallback images
+  const defaultImages = [
+    { imageUrl: "img/pic1.jpg", imageAlt: "About Image 1" },
+    { imageUrl: "img/pic2.jpg", imageAlt: "About Image 2" },
+    { imageUrl: "img/pic3.jpg", imageAlt: "About Image 3" }
+  ];
+
+  // Fetch images from API
+useEffect(() => {
+  const fetchAboutImages = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        "http://localhost:4010/api/content/types/dashboard_image?isActive=true&limit=50"
+      );
+
+      if (response.data.success && response.data.data.length > 0) {
+        const sortedImages = response.data.data.sort((a, b) => a.order - b.order);
+        // pehle defaultImages + phir API images
+        setAboutImages([...defaultImages, ...sortedImages]);
+      } else {
+        setAboutImages(defaultImages);
+      }
+    } catch (error) {
+      console.error("Error fetching about images:", error);
+      setAboutImages(defaultImages);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  fetchAboutImages();
+}, []);
+
+  const displayImages = aboutImages.length > 0 ? aboutImages : defaultImages;
+
+
 
   return (
     <section className="as_about_wrapper as_padderTop80 as_padderBottom80">
       <div className="container">
         <div className="row">
-          {/* Left Side - Slider */}
+          {/* Left Side - Bootstrap Carousel */}
           <div className="col-lg-6 col-md-12 col-sm-12 col-12">
-            <Slider {...settings} className="as_about_slider">
-              <div>
-                <div className="as_aboutimg text-right">
-                  <img
-                    src="img/pic1.jpg"
-                    alt=""
-                    className="img-responsive"
-                    style={{ height: "505px", width: "463px" }}
-                  />
+            {loading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
-              <div>
-                <div className="as_aboutimg text-right">
-                  <img
-                    src="img/pic2.jpg"
-                    alt=""
-                    className="img-responsive"
-                    style={{ height: "505px", width: "463px" }}
-                  />
+            ) : (
+              <div id="aboutCarousel" className="carousel slide" data-bs-ride="carousel">
+                {/* Dots */}
+                <div className="carousel-indicators">
+                  {displayImages.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      data-bs-target="#aboutCarousel"
+                      data-bs-slide-to={index}
+                      className={index === 0 ? "active" : ""}
+                      aria-current={index === 0 ? "true" : undefined}
+                      aria-label={`Slide ${index + 1}`}
+                    ></button>
+                  ))}
                 </div>
-              </div>
-              <div>
-                <div className="as_aboutimg text-right">
-                  <img
-                    src="img/pic3.jpg"
-                    alt=""
-                    className="img-responsive"
-                    style={{ height: "505px", width: "463px" }}
-                  />
+
+                {/* Slides */}
+                <div className="carousel-inner">
+                  {displayImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`carousel-item ${index === 0 ? "active" : ""}`}
+                      data-bs-interval="3000"
+                    >
+                      <img
+                        src={image.imageUrl}
+                        alt={image.imageAlt || `About Image ${index + 1}`}
+                        className="d-block w-100"
+                        style={{ height: "max-content", width: "463px", objectFit: "cover" }}
+                        onError={(e) => {
+                          e.target.src = defaultImages[index % defaultImages.length]?.imageUrl;
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
+
+                {/* Controls */}
+                <button
+                  className="carousel-control-prev"
+                  type="button"
+                  data-bs-target="#aboutCarousel"
+                  data-bs-slide="prev"
+                >
+                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span className="visually-hidden">Previous</span>
+                </button>
+                <button
+                  className="carousel-control-next"
+                  type="button"
+                  data-bs-target="#aboutCarousel"
+                  data-bs-slide="next"
+                >
+                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span className="visually-hidden">Next</span>
+                </button>
               </div>
-            </Slider>
+            )}
           </div>
 
           {/* Right Side - Content */}
