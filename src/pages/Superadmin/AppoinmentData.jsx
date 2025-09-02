@@ -25,7 +25,7 @@ export default function AppoinmentData() {
       if (status) params.append('status', status);
       if (date) params.append('date', date);
       
-      const response = await axios.get(`http://localhost:4010/api/appointments?${params}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/appointments?${params}`);
       
       if (response.data.success) {
         setAppointments(response.data.data);
@@ -43,7 +43,7 @@ export default function AppoinmentData() {
   // Update appointment status
   const updateAppointmentStatus = async (appointmentId, newStatus, appointmentNotes = '') => {
     try {
-      const response = await axios.put(`http://localhost:4010/api/appointments/${appointmentId}/status`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/appointments/${appointmentId}/status`, {
         status: newStatus,
         notes: appointmentNotes
       });
@@ -63,7 +63,7 @@ export default function AppoinmentData() {
   const deleteAppointment = async (appointmentId) => {
     if (window.confirm('Are you sure you want to delete this appointment?')) {
       try {
-        const response = await axios.delete(`http://localhost:4010/api/appointments/${appointmentId}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/appointments/${appointmentId}`);
         
         if (response.data.success) {
           fetchAppointments(currentPage, statusFilter, dateFilter);

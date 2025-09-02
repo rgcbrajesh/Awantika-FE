@@ -30,7 +30,7 @@ export default function MemoryData() {
   const fetchMemories = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:4010/api/content/types/memory?page=${page}&limit=10`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/content/types/memory?page=${page}&limit=10`);
       
       if (response.data.success) {
         setMemories(response.data.data);
@@ -55,9 +55,9 @@ export default function MemoryData() {
 
       let response;
       if (editingMemory) {
-        response = await axios.put(`http://localhost:4010/api/content/${editingMemory._id}`, memoryData);
+        response = await axios.put(`${process.env.REACT_APP_API_URL}/api/content/${editingMemory._id}`, memoryData);
       } else {
-        response = await axios.post('http://localhost:4010/api/content', memoryData);
+        response = await axios.post(`${process.env.REACT_APP_API_URL}/api/content`, memoryData);
       }
       
       if (response.data.success) {
@@ -75,7 +75,7 @@ export default function MemoryData() {
   const deleteMemory = async (memoryId) => {
     if (window.confirm('Are you sure you want to delete this memory?')) {
       try {
-        const response = await axios.delete(`http://localhost:4010/api/content/${memoryId}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/content/${memoryId}`);
         
         if (response.data.success) {
           fetchMemories(currentPage);
@@ -86,7 +86,6 @@ export default function MemoryData() {
       }
     }
   };
-
 
   const resetForm = () => {
     setFormData({
@@ -259,7 +258,7 @@ export default function MemoryData() {
                       >
                         ✏️
                       </button>
-                     
+                      
                       <button
                         className={`btn btn-sm btn-outline-danger ${styles.actionButton}`}
                         onClick={() => deleteMemory(memory._id)}

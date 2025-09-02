@@ -28,7 +28,7 @@ export default function DashboardImageData() {
   const fetchDashboardImages = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:4010/api/content/types/dashboard_image?page=${page}&limit=10`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/content/types/dashboard_image?page=${page}&limit=10`);
       
       if (response.data.success) {
         setDashboardImages(response.data.data);
@@ -53,9 +53,9 @@ export default function DashboardImageData() {
 
       let response;
       if (editingImage) {
-        response = await axios.put(`http://localhost:4010/api/content/${editingImage._id}`, imageData);
+        response = await axios.put(`${process.env.REACT_APP_API_URL}/api/content/${editingImage._id}`, imageData);
       } else {
-        response = await axios.post('http://localhost:4010/api/content', imageData);
+        response = await axios.post(`${process.env.REACT_APP_API_URL}/api/content`, imageData);
       }
       
       if (response.data.success) {
@@ -73,7 +73,7 @@ export default function DashboardImageData() {
   const deleteDashboardImage = async (imageId) => {
     if (window.confirm('Are you sure you want to delete this dashboard image?')) {
       try {
-        const response = await axios.delete(`http://localhost:4010/api/content/${imageId}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/content/${imageId}`);
         
         if (response.data.success) {
           fetchDashboardImages(currentPage);
@@ -84,7 +84,6 @@ export default function DashboardImageData() {
       }
     }
   };
-
 
   const resetForm = () => {
     setFormData({
@@ -244,7 +243,7 @@ export default function DashboardImageData() {
                       >
                         ✏️
                       </button>
-                    
+                      
                       <button
                         className={`btn btn-sm btn-outline-danger ${styles.actionButton}`}
                         onClick={() => deleteDashboardImage(image._id)}

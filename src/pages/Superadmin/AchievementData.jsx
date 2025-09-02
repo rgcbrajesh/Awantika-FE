@@ -27,7 +27,7 @@ export default function AchievementData() {
   const fetchAchievements = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:4010/api/content/types/achievement?page=${page}&limit=10`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/content/types/achievement?page=${page}&limit=10`);
       
       if (response.data.success) {
         setAchievements(response.data.data);
@@ -51,9 +51,9 @@ export default function AchievementData() {
 
       let response;
       if (editingAchievement) {
-        response = await axios.put(`http://localhost:4010/api/content/${editingAchievement._id}`, achievementData);
+        response = await axios.put(`${process.env.REACT_APP_API_URL}/api/content/${editingAchievement._id}`, achievementData);
       } else {
-        response = await axios.post('http://localhost:4010/api/content', achievementData);
+        response = await axios.post(`${process.env.REACT_APP_API_URL}/api/content`, achievementData);
       }
       
       if (response.data.success) {
@@ -71,7 +71,7 @@ export default function AchievementData() {
   const deleteAchievement = async (achievementId) => {
     if (window.confirm('Are you sure you want to delete this achievement?')) {
       try {
-        const response = await axios.delete(`http://localhost:4010/api/content/${achievementId}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/content/${achievementId}`);
         
         if (response.data.success) {
           fetchAchievements(currentPage);
@@ -251,7 +251,7 @@ export default function AchievementData() {
                       >
                         ✏️
                       </button>
-                    
+                      
                       <button
                         className={`btn btn-sm btn-outline-danger ${styles.actionButton}`}
                         onClick={() => deleteAchievement(achievement._id)}

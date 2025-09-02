@@ -26,7 +26,7 @@ export default function FeedbackData() {
       if (status) params.append('status', status);
       if (category) params.append('category', category);
       
-      const response = await axios.get(`http://localhost:4010/api/feedback?${params}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/feedback?${params}`);
       
       if (response.data.success) {
         setFeedbacks(response.data.data);
@@ -45,7 +45,7 @@ export default function FeedbackData() {
   // Update feedback status
   const updateFeedbackStatus = async (feedbackId, newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:4010/api/feedback/${feedbackId}/status`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}/status`, {
         status: newStatus
       });
       
@@ -61,7 +61,7 @@ export default function FeedbackData() {
   // Add response to feedback
   const addResponse = async (feedbackId, responseText) => {
     try {
-      const response = await axios.put(`http://localhost:4010/api/feedback/${feedbackId}/respond`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/feedback/${feedbackId}/respond`, {
         response: responseText
       });
       

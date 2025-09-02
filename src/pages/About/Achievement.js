@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Header from '../../component/Header'
 import Footer from '../../component/Footer'
-import Breadcrumb from '../../component/Breadcrumb'
 import axios from 'axios'
 
 const AchievementSection = () => {
@@ -74,18 +73,7 @@ const AchievementSection = () => {
     fetchAchievements();
   }, []);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "-- --, ----";
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit'
-      });
-    } catch {
-      return "-- --, ----";
-    }
-  };
+
 
   if (loading) {
     return (

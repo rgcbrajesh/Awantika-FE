@@ -21,7 +21,7 @@ export default function ContactUSData() {
       
       if (status) params.append('status', status);
       
-      const response = await axios.get(`http://localhost:4010/api/contact?${params}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/contact?${params}`);
       
       if (response.data.success) {
         setContacts(response.data.data);
@@ -39,7 +39,7 @@ export default function ContactUSData() {
   // Update contact status
   const updateContactStatus = async (contactId, newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:4010/api/contact/${contactId}/status`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/contact/${contactId}/status`, {
         status: newStatus
       });
       
